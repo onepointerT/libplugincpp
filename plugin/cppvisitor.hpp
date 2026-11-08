@@ -5,6 +5,7 @@
 
 #include "anyclass_client.hpp"
 #include "context.hpp"
+#include "plugin_view.hpp"
 
 #include <any>
 #include <map>
@@ -14,6 +15,23 @@
 
 namespace plugin {
 namespace util {
+
+template< class _IsFor, typename property_flags_t = plugin_flags >
+class Visitor;
+class VisitorAcceptor;
+
+
+template< class Produces, class PredictsWith = Produces >
+class VisitableType
+    :   public VisitorAcceptor
+{}
+
+template< class AbstractSpecificType, class _IsFor = AbstractSpecificType >
+class AdaptiveVisitor
+    :   public Visitor< AbstractSpecificType >
+    ,   public Adaption< AdaptiveVisitor< _IsFor > >
+{};
+
 
 // Forward declaration
 class VisitorAcceptor;
@@ -52,11 +70,13 @@ public:
 };
 
 
+template< class InformsWith, class ProducesWith = PluginView >
 class VisitorAcceptor {
 protected:
     std::vector< VisitorClientPair* > informing_abonement;
 
 public:
+    typedef typename ProducesWith::< InformsWith > information_t;
     template< class Client, class Visiting >
     virtual bool inform_cli_on_visit( Visiting& vis, Client& cli ) {
         return this->informing_abonement.emplace_back( *new VisitorClientPair( cli, vis ) ) != nullptr;
@@ -85,7 +105,7 @@ protected:
 // main program's/librarie's and the plugin's execution stack's
 // state. Is normally given from `PluginAPI` to `PluginCompositor`,
 // so that the plugin context only needs to decide, which strategy to start.
-template< typename property_flags_t = plugin_flags >
+template< class _IsFor, typename property_flags_t = plugin_flags >
 class Visitor
 {
 protected:

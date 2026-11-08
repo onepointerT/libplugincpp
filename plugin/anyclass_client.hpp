@@ -136,10 +136,10 @@ public:
         using GenerellSortType = typename _OfSpecificKind::CanSortType< AbstractKindType::TypeFor<GivenType> >;
 
         GivenType& AnyAtOwnClass();
-        GenericType<  >
+        //GenericType<  >
     };
 
-    class GenerellAbstractType
+    class GenerellAbstractType;
 
     template< class GivenType >
     class GenericType
@@ -272,8 +272,19 @@ protected:
                 return GenerellObjectFor< MetaImplementation< _ForKind > >( meta_implementation_for_sort );
             }
 
-            template< class _ForASort >
-            static Implements(  _OfSort ) final;
+            
+            virtual std::type_info Implementing() const {
+                return decltype(_ForWhichKind); // _ForWhichKindIsExactly the GivenType of class that it implements
+            }
+
+            bool Implements( const std::type_info _ForASort ) final {
+                return this->Implementing().hash() == _ForASort.hash()
+                        || std::is_base_of_v< decltype(std::declval(_ForASort.name())), decltype(std::declval(this->Implementing().name())) >();
+            }
+
+            static bool ImplementsFor( const std::type_info _ForASort ) final {
+                return std::is_base_of_v< decltype(std::declval(this->Implementing().name())), decltype(std::declval(_ForASort.name())) >();
+            }
 
             template< class _ForKind >
             class MetaWritable {
