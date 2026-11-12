@@ -1,37 +1,22 @@
-// Copyright 2025 The OnePointer Authors.
+// Copyright 2025-2026 The OnePointer Authors.
 //
 
-#include <ranges>
+
+#include "cppinformative.hpp"
 
 
 namespace plugin {
+namespace util {
 
-class InformationPacket;
-
-template< class IsInformedWith = InformationPacket >
-class Informable {
-public:
-    using TransformToInformation
-            = util::TypeResult< IsInformedWith, InformationPacket >;
-
-
-    TransformToInformation::GivesFromAny< InformationPacket >&
-            Inform( const IsInformedWith& informate_with ) const final {
-        return TransformToInformation::makeDecayFree( informate_with );
-    }
-
-    InformationPacket& InformationOf() const final {
-        return this->Inform( this ).own.
-    }
-}
 
 
 class PluginView
 {
 public:
     template< class IsInformedWith >
-    using 
+    using InformationType = util::Informable< PluginView >;
 };
 
 
+} // namespace util
 } // namespace plugin

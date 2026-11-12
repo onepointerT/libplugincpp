@@ -22,12 +22,12 @@ set( PROJECT_NAME "libplugin" )
 set( PROJECT_DESCRIPTION "A dynamic library for secure plugins for your code with C++ from OnePointer UG." )
 set( PROJECT_VERSION "0.0.1" )
 
-set( CMAKE_CXX_STANDARD 23 )
+set( CMAKE_CXX_STANDARD 26 )
 
 include_directories( ${PROJECT_SOURCE_DIR} )
 
-add_subdirectory( ${PROJECT_SOURCE_DIR}/plugin/api )
+# add_subdirectory( ${PROJECT_SOURCE_DIR}/plugin/api )
 
 file( GLOB ONEPTR_PLUGIN_SRC ${PROJECT_SOURCE_DIR}/plugin/*.cpp )
 add_library( oneptr_plugin ${ONEPTR_PLUGIN_SRC} )
-target_link_libraries( oneptr_plugin absl_plugin )
+# target_link_libraries( oneptr_plugin absl_plugin )

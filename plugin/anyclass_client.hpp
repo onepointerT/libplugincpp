@@ -1,4 +1,4 @@
-// Copyright 2025 The OnePointer Authors.
+// Copyright 2025-2026 The OnePointer Authors.
 //
 
 #pragma once
@@ -279,11 +279,15 @@ protected:
 
             bool Implements( const std::type_info _ForASort ) final {
                 return this->Implementing().hash() == _ForASort.hash()
-                        || std::is_base_of_v< decltype(std::declval(_ForASort.name())), decltype(std::declval(this->Implementing().name())) >();
+                        || std::is_base_of_v< decltype(std::declval(std::type_index(_ForASort).name()))
+                                            , decltype(std::declval(std::type_index(this->Implementing()).name()))
+                            >();
             }
 
             static bool ImplementsFor( const std::type_info _ForASort ) final {
-                return std::is_base_of_v< decltype(std::declval(this->Implementing().name())), decltype(std::declval(_ForASort.name())) >();
+                return std::is_base_of_v< decltype(std::declval(std::type_index(this->Implementing()).name()))
+                                        , decltype(std::declval(std::type_index(_ForASort).name()))
+                            >();
             }
 
             template< class _ForKind >
@@ -717,6 +721,15 @@ public:
     template< class GenericType, class AnyClassBaseT >
     GenericType& generic() {
         return AnyClassBaseT::generic( this->any_class< GenericType >().own );
+    }
+
+    auto get() const {
+        return std::any_cast<decltype(std::declval<std::type_index(this->type)>)>(this);
+    }
+
+    template< class _Ty >
+    _Ty getAs() const {
+        return std::any_cast<_Ty=decltype(std::declval<std::type_index(this->type)>)>(this);
     }
 
     int startup( const plugin_flags pf );

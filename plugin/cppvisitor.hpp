@@ -14,17 +14,59 @@
 
 
 namespace plugin {
+
+namespace meta {
+template< class _IsForSort, class PredictsWith >
+class MetaPredictive
+{
+public:
+    typedef typename PredictsWith PredictsWithType;
+
+    PredictsWith predictor;
+};
+
+template< class ProducesResultsWith >
+class MetaPredictor
+    :   public MetaPredictive< ProducesResultsWith, ProducesResultsWith >
+    ,   public MetaPredictive< ProducesResultsWith, ProducesResultsWith >::PredictsWithType
+{
+public:
+
+};
+
+template< class _IsFor, class ProducesResultsWith >
+class MetaAcceptor
+    :   public MetaPredictive< _IsFor, ProducesResultsWith >
+{
+public:
+    MetaPredictor< ProducesResultsWith > predictor;
+
+};
+
+} // namespace meta
+
 namespace util {
 
 template< class _IsFor, typename property_flags_t = plugin_flags >
 class Visitor;
-class VisitorAcceptor;
-
 
 template< class Produces, class PredictsWith = Produces >
 class VisitableType
-    :   public VisitorAcceptor
-{}
+    :   public meta::MetaAcceptor< PredictsWith, Produces >
+    ,   public PredictsWith
+{};
+
+
+
+template< class _IsFor, class _IsSortOf, class ProducesResultsWith = VisitableType< _IsFor, _IsFor > >
+class VisitorAcceptor
+    :   public meta::MetaAcceptor< _IsFor, ProducesResultsWith >
+    ,   public VisitableType< _IsFor, AdaptiveVisitor<_IsSortOf, _IsFor> >
+    ,   public _IsSortOf
+    ,   public ProducesResultsWith
+{
+
+};
 
 template< class AbstractSpecificType, class _IsFor = AbstractSpecificType >
 class AdaptiveVisitor
